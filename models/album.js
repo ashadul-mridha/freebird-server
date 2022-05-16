@@ -26,6 +26,9 @@ const albumSchema = mongoose.Schema(
         desc: {
             type : String,
         },
+        image: {
+            type : String,
+        },
         isActive : {
             type: String,
             enum : ["active", "inactive"],

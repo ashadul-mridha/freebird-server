@@ -1,7 +1,5 @@
 //external imports
 const express = require('express');
-const path = require("path");
-const fs = require('fs');
 
 //internal import
 const { getAllData, getDataByID, insetSingleUpload, dataDeleteById, updateDataByID } = require('../controllers/homePageController');

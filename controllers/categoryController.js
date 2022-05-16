@@ -1,17 +1,16 @@
 // external import 
 const path = require("path");
 const fs = require('fs');
+const uniqueSlug = require('unique-slug');
 
 //internal import
-const HomePage = require('../models/homePage');
-
+const Category = require('../models/category');
 const directory = path.parse('E:/Project/FreeBird-project/FreeBirdServer/controllers').dir ;
-
 
 //get all data
 const getAllData = async (req,res) => {
     try {
-        const data = await HomePage.find();
+        const data = await Category.find();
 
         res.send({
           status: true,
@@ -35,7 +34,7 @@ const getAllData = async (req,res) => {
 //get data by id
 const getDataByID = async (req,res) => {
     try {
-        const data = await HomePage.findOne( {_id: req.params.id} );
+        const data = await Category.findOne( {_id: req.params.id} );
 
         res.send({
           status: true,
@@ -60,12 +59,14 @@ const getDataByID = async (req,res) => {
 const insetSingleUpload = async (req, res) => {
 
     try {
+    
+    let finalFileName;
 
-      if (req.files) {
+    if (req.files) {
 
         //get files
-        const bgImgFile = req.files.bgImg;
-        const UploadedFilName = bgImgFile.name;
+        const imageFile = req.files.image;
+        const UploadedFilName = imageFile.name;
 
         const fileExt = path.extname(UploadedFilName);
         const fileNameWithoutExt =
@@ -79,20 +80,23 @@ const insetSingleUpload = async (req, res) => {
 
         finalFileName = fileNameWithoutExt + fileExt;
 
-        const uploadPath = `${directory}/public/uploads/homepageimg/${finalFileName}`;
+        const uploadPath = `${directory}/public/uploads/categoryimg/${finalFileName}`;
 
-        bgImgFile.mv( uploadPath , (err) => {
+        imageFile.mv( uploadPath , (err) => {
           if (err) {
             new Error('File Not Uploaded')
           }
         })
 
-      }
+    }
 
-      const homePageData = {...req.body , bgImg : finalFileName }
+        const slug = uniqueSlug(req.body.name);
+        console.log(slug);
 
-            const insertHomeData = new HomePage(homePageData);
-            const data = await insertHomeData.save();
+        const CategoryData = {...req.body , image : finalFileName , slug }
+
+            const insertCategoryData = new Category(CategoryData);
+            const data = await insertCategoryData.save();
             
             res.send({
             status: true,
@@ -119,14 +123,14 @@ const insetSingleUpload = async (req, res) => {
 const updateDataByID = async (req,res) => {
 
     try {
-        const storedData = await HomePage.findOne( {_id: req.params.id} );
-        let finalFileName = storedData.bgImg;
-        // console.log(storedData);
+        const storedData = await Category.findOne( {_id: req.params.id} );
+        let finalFileName = storedData.image;
+        
         //delete and store new image
-        if(req.files.bgImg){
+        if(req.files){
 
             //deleted 1st image
-            fs.unlink(`${directory}/public/uploads/homepageimg/${storedData.bgImg}`, (err) => {
+            fs.unlink(`${directory}/public/uploads/categoryimg/${storedData.image}`, (err) => {
               if(err){
                     console.log(err.message);
                 new Error('Image Not Deleted')
@@ -138,8 +142,8 @@ const updateDataByID = async (req,res) => {
             //store new image
 
             //get files
-            const bgImgFile = req.files.bgImg;
-            const UploadedFilName = bgImgFile.name;
+            const imageFile = req.files.image;
+            const UploadedFilName = imageFile.name;
 
             const fileExt = path.extname(UploadedFilName);
             const fileNameWithoutExt =
@@ -153,9 +157,9 @@ const updateDataByID = async (req,res) => {
 
             finalFileName = fileNameWithoutExt + fileExt;
 
-            const uploadPath = `${directory}/public/uploads/homepageimg/${finalFileName}`;
+            const uploadPath = `${directory}/public/uploads/categoryimg/${finalFileName}`;
 
-            bgImgFile.mv( uploadPath , (err) => {
+            imageFile.mv( uploadPath , (err) => {
                 if (err) {
                     console.log(err.message);
                     new Error('File Not Uploaded')
@@ -166,14 +170,16 @@ const updateDataByID = async (req,res) => {
 
         }
 
-         const result = await HomePage.findByIdAndUpdate(
+         const result = await Category.findByIdAndUpdate(
             { _id : req.params.id},
             {
                 $set : {
+                    name: req.body.name,
                     title: req.body.title,
                     subTitle : req.body.subTitle,
                     desc: req.body.desc,
-                    bgImg: finalFileName
+                    image: finalFileName,
+                    isActive: req.body.isActive
                 }
             },
             {
@@ -207,10 +213,10 @@ const updateDataByID = async (req,res) => {
 
 const dataDeleteById = async (req,res) => {
     try {
-        const data = await HomePage.findOneAndDelete( {_id: req.params.id} );
+        const data = await Category.findOneAndDelete( {_id: req.params.id} );
         
-        if(data.bgImg){
-            fs.unlink(`${directory}/public/uploads/homepageimg/${data.bgImg}`, (err) => {
+        if(data.image){
+            fs.unlink(`${directory}/public/uploads/categoryimg/${data.image}`, (err) => {
               if(err){
                 new Error('Image Not Deleted')
               } else {

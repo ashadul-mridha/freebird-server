@@ -5,9 +5,13 @@ const path = require('path');
 const dotenv = require('dotenv').config();
 const cors = require('cors');
 const fileUpload = require('express-fileupload');
+
 //internal imports
-const homePageRouter = require('./routers/homePageRouter');
 const { notFoundhandler,  defaultErrorHandler } = require('./middlewares/common/errorHandler');
+
+//router import
+const homePageRouter = require('./routers/homePageRouter');
+const categoryRouter = require('./routers/categoryRouter');
 
 
 const app = express();
@@ -32,11 +36,16 @@ mongoose.connect(process.env.mongoDB_Connection_string,{
 .catch( (err) => console.log(err))
 
 //routing setup
-app.use('/homepage', homePageRouter);
+app.use('/api/homepage', homePageRouter);
+app.use('/api/category', categoryRouter);
 
 app.get("/", (req,res) => {
     res.send({message : "Hello Word"})
 })
+
+// app.get("/api/category/all", (req,res) => {
+//     res.send({message : "Hello Word"})
+// })
 
 //not found handler
 app.use(notFoundhandler);
@@ -44,7 +53,7 @@ app.use(notFoundhandler);
 //common error handler
 app.use(defaultErrorHandler);
 
-
-app.listen(5000, () => {
+const port = process.env.DOMAIN || 5000
+app.listen(port, () => {
     console.log('app running on port 5000');
 })

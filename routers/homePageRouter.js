@@ -4,9 +4,7 @@ const path = require("path");
 const fs = require('fs');
 
 //internal import
-const HomePage = require('../models/homePage');
 const { getAllData, getDataByID, insetSingleUpload, dataDeleteById, updateDataByID } = require('../controllers/homePageController');
-// const singleImgUploader = require('../utilities/singleImgUploader');
 
 //define new router
 const router = express.Router();

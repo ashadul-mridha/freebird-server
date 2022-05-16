@@ -4,9 +4,7 @@ const fs = require('fs');
 
 //internal import
 const HomePage = require('../models/homePage');
-
 const directory = path.parse('E:/Project/FreeBird-project/FreeBirdServer/controllers').dir ;
-
 
 //get all data
 const getAllData = async (req,res) => {

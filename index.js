@@ -16,6 +16,7 @@ const albumRouter = require('./routers/albumRouter');
 const imageRouter = require('./routers/imageRouter');
 const contactusRouter = require('./routers/contactUsRouter');
 const aboutmeRouter = require('./routers/aboutmeRouter');
+const clientRouter = require('./routers/clientRouter');
 
 
 const app = express();
@@ -46,6 +47,7 @@ app.use('/api/album', albumRouter);
 app.use('/api/image', imageRouter);
 app.use('/api/contactus', contactusRouter);
 app.use('/api/aboutme', aboutmeRouter);
+app.use('/api/client', clientRouter);
 
 app.get("/", (req,res) => {
     res.send({message : "Hello Word"})

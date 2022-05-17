@@ -1,17 +1,16 @@
 // external import 
 const path = require("path");
 const fs = require('fs');
+const uniqueSlug = require('unique-slug');
 
 //internal import
-const ContactUs = require('../models/aboutMe');
-
+const AboutMe = require('../models/aboutMe');
 const directory = path.parse('E:/Project/FreeBird-project/FreeBirdServer/controllers').dir ;
-
 
 //get all data
 const getAllData = async (req,res) => {
     try {
-        const data = await ContactUs.find();
+        const data = await AboutMe.find();
 
         res.send({
           status: true,
@@ -35,7 +34,7 @@ const getAllData = async (req,res) => {
 //get data by id
 const getDataByID = async (req,res) => {
     try {
-        const data = await ContactUs.findOne( {_id: req.params.id} );
+        const data = await AboutMe.findOne( {_id: req.params.id} );
 
         res.send({
           status: true,
@@ -48,7 +47,7 @@ const getDataByID = async (req,res) => {
         
         res.send({
           status: false,
-          message: "failed to fatch data",
+          message: error.message,
           data : null,
           statusCode: 500
         })  
@@ -60,28 +59,63 @@ const getDataByID = async (req,res) => {
 const insetSingleUpload = async (req, res) => {
 
     try {
+    
+    let finalFileName;
 
-            const insertContactUsData = new ContactUs(req.body);
-            const data = await insertContactUsData.save();
-            
-            res.send({
+    if (req.files) {
+
+        //get files
+        const imageFile = req.files.image;
+        const UploadedFilName = imageFile.name;
+
+        const fileExt = path.extname(UploadedFilName);
+        const fileNameWithoutExt =
+          UploadedFilName
+            .replace(fileExt, "")
+            .toLowerCase()
+            .split(" ")
+            .join("-") +
+          "-" +
+          Date.now();
+
+        finalFileName = fileNameWithoutExt + fileExt;
+
+        const uploadPath = `${directory}/public/uploads/aboutmeimg/${finalFileName}`;
+
+        imageFile.mv( uploadPath , (err) => {
+          if (err) {
+            new Error('File Not Uploaded')
+          }
+        })
+
+    }
+
+        const slug = uniqueSlug(req.body.title);
+        console.log(slug);
+
+        const AboutData = {...req.body , image : finalFileName , slug }
+
+        const insertAboutData = new AboutMe(AboutData);
+        const data = await insertAboutData.save();
+        
+        res.send({
             status: true,
             message: "data added successfull",
             data : data,
             statusCode: 200
-            })
+        })
 
-        } catch (error) {
-            
-            console.log(error.message); 
+    } catch (error) {
+        
+        console.log(error.message); 
 
-            res.send({
-            status: false,
-            message: error.message,
-            data : null,
-            statusCode: 500
-            })
-        }
+        res.send({
+        status: false,
+        message: error.message,
+        data : null,
+        statusCode: 500
+        })
+    }
         
     }
 
@@ -89,15 +123,66 @@ const insetSingleUpload = async (req, res) => {
 const updateDataByID = async (req,res) => {
 
     try {
+        const storedData = await AboutMe.findOne( {_id: req.params.id} );
+        let finalFileName = storedData.image;
+        
+        //delete and store new image
+        if(req.files){
 
-         const result = await ContactUs.findByIdAndUpdate(
+            //deleted 1st image
+            fs.unlink(`${directory}/public/uploads/aboutmeimg/${storedData.image}`, (err) => {
+              if(err){
+                    console.log(err.message);
+                new Error('Image Not Deleted')
+              } else {
+                console.log('img deleted');
+              }
+            })
+
+            //store new image
+
+            //get files
+            const imageFile = req.files.image;
+            const UploadedFilName = imageFile.name;
+
+            const fileExt = path.extname(UploadedFilName);
+            const fileNameWithoutExt =
+            UploadedFilName
+                .replace(fileExt, "")
+                .toLowerCase()
+                .split(" ")
+                .join("-") +
+            "-" +
+            Date.now();
+
+            finalFileName = fileNameWithoutExt + fileExt;
+
+            const uploadPath = `${directory}/public/uploads/aboutmeimg/${finalFileName}`;
+
+            imageFile.mv( uploadPath , (err) => {
+                if (err) {
+                    console.log(err.message);
+                    new Error('File Not Uploaded')
+                }else {
+                    console.log('file uploaded');
+                }
+            })
+
+        }
+
+         const result = await AboutMe.findByIdAndUpdate(
             { _id : req.params.id},
             {
                 $set : {
-                    name: req.body.name,
-                    email : req.body.email,
-                    subject: req.body.subject,
-                    message: req.body.message
+                    title: req.body.title,
+                    desc : req.body.desc,
+                    fb_link: req.body.fb_link,
+                    instagram_link: req.body.instagram_link,
+                    twitter_link: req.body.twitter_link,
+                    youtube_link: req.body.youtube_link,
+                    fb_link: req.body.fb_link,
+                    image: finalFileName,
+                    isActive: req.body.isActive
                 }
             },
             {
@@ -105,13 +190,15 @@ const updateDataByID = async (req,res) => {
                 useFindAndModify: false,
             }
         )
-        
+
         res.status(200).json({
             status: true,
             Message : "data Updated Successfull",
             data: result,
             statusCode: 200
         })
+        
+        
         
     } catch (error) {
         
@@ -131,14 +218,34 @@ const updateDataByID = async (req,res) => {
 
 const dataDeleteById = async (req,res) => {
     try {
-        const data = await ContactUs.findOneAndDelete( {_id: req.params.id} );
+        const data = await AboutMe.findOneAndDelete( {_id: req.params.id} );
         
-         res.send({
-            status: true,
-            message: "data deleted successfull",
-            data : data,
-            statusCode: 200
-        })
+        if(data){
+            fs.unlink(`${directory}/public/uploads/aboutmeimg/${data.image}`, (err) => {
+              if(err){
+                new Error('Image Not Deleted')
+              } else {
+                
+              }
+            })
+        }
+        
+        if (data === null) {
+            res.status(200).json({
+                status: true,
+                Message : "deleted id not found",
+                data: data,
+                statusCode: 200
+            })
+            
+        }else{
+            res.status(200).json({
+                status: true,
+                Message : "data Updated Successfull",
+                data: data,
+                statusCode: 200
+            })
+        }
 
     } catch (error) {
 

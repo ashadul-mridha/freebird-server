@@ -3,7 +3,7 @@ const path = require("path");
 const fs = require('fs');
 
 //internal import
-const ContactUs = require('../models/contactUs');
+const ContactUs = require('../models/aboutMe');
 
 const directory = path.parse('E:/Project/FreeBird-project/FreeBirdServer/controllers').dir ;
 

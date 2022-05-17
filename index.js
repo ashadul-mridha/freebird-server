@@ -13,6 +13,7 @@ const { notFoundhandler,  defaultErrorHandler } = require('./middlewares/common/
 const homePageRouter = require('./routers/homePageRouter');
 const categoryRouter = require('./routers/categoryRouter');
 const albumRouter = require('./routers/albumRouter');
+const imageRouter = require('./routers/imageRouter');
 
 
 const app = express();
@@ -40,6 +41,7 @@ mongoose.connect(process.env.mongoDB_Connection_string,{
 app.use('/api/homepage', homePageRouter);
 app.use('/api/category', categoryRouter);
 app.use('/api/album', albumRouter);
+app.use('/api/image', imageRouter);
 
 app.get("/", (req,res) => {
     res.send({message : "Hello Word"})

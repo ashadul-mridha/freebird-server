@@ -10,12 +10,26 @@ const directory = path.parse('E:/Project/FreeBird-project/FreeBirdServer/control
 //get all data
 const getAllData = async (req,res) => {
     try {
-        const data = await Category.find();
+
+        let { page , size } = req.query;
+        
+        if(!page){
+            page = 1
+        }
+        if(!size){
+            size = 10
+        }
+        const limit = parseInt(size);
+        const skip = ( parseInt(page) - 1) * size;
+
+        const data = await Category.find().limit(limit).skip(skip);
+        const totalData = await Category.countDocuments();
 
         res.send({
           status: true,
           message: "data get successfull",
           data : data,
+          totalData,
           statusCode: 200
         })
 
@@ -47,7 +61,7 @@ const getDataByID = async (req,res) => {
         
         res.send({
           status: false,
-          message: "failed to fatch data",
+          message: error.message,
           data : null,
           statusCode: 500
         })  

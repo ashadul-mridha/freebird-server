@@ -10,12 +10,25 @@ const directory = path.parse('E:/Project/FreeBird-project/FreeBirdServer/control
 //get all data
 const getAllData = async (req,res) => {
     try {
-        const data = await AboutMe.find();
+        let { page , size } = req.query;
+        
+        if(!page){
+            page = 1
+        }
+        if(!size){
+            size = 10
+        }
+        const limit = parseInt(size);
+        const skip = ( parseInt(page) - 1) * size;
+
+        const data = await AboutMe.find().limit(limit).skip(skip);
+        const totalData = await AboutMe.countDocuments();
 
         res.send({
           status: true,
           message: "data get successfull",
           data : data,
+          totalData,
           statusCode: 200
         })
 

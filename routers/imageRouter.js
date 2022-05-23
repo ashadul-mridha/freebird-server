@@ -2,7 +2,7 @@
 const express = require('express');
 
 //internal import
-const { getAllData, getDataByID, insetSingleUpload, dataDeleteById, updateDataByID } = require('../controllers/imageController');
+const { getAllData, getDataByID, getAlbumImgByID, getCategoryImgByID, insetSingleUpload, dataDeleteById, updateDataByID } = require('../controllers/imageController');
 
 //define new router
 const router = express.Router();
@@ -12,6 +12,12 @@ router.get('/all', getAllData)
 
 //get data by id
 router.get('/:id', getDataByID)
+
+//get albumImg by id
+router.get('/album/:id', getAlbumImgByID)
+
+//get albumImg by id
+router.get('/category/:id', getCategoryImgByID)
 
 //insert home page data
 

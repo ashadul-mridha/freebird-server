@@ -69,6 +69,55 @@ const getDataByID = async (req,res) => {
     }
 }
 
+//get album image by id
+const getAlbumImgByID = async (req,res) => {
+    try {
+        const data = await Image.find( {album_id: req.params.id} ).populate('cat_id').populate('album_id');
+
+        res.send({
+          status: true,
+          message: "data get successfull",
+          data : data,
+          statusCode: 200
+        })
+
+    } catch (error) {
+        
+        res.send({
+          status: false,
+          message: "failed to fatch data",
+          data : null,
+          statusCode: 500
+        })  
+
+    }
+}
+
+
+//get category image by id
+const getCategoryImgByID = async (req,res) => {
+    try {
+        const data = await Image.find( {cat_id: req.params.id} ).populate('cat_id').populate('album_id');
+
+        res.send({
+          status: true,
+          message: "data get successfull",
+          data : data,
+          statusCode: 200
+        })
+
+    } catch (error) {
+        
+        res.send({
+          status: false,
+          message: "failed to fatch data",
+          data : null,
+          statusCode: 500
+        })  
+
+    }
+}
+
 //inset a single upload data
 const insetSingleUpload = async (req, res) => {
 
@@ -256,4 +305,4 @@ const dataDeleteById = async (req,res) => {
 }
 
 
-module.exports = { getAllData , getDataByID, insetSingleUpload, dataDeleteById, updateDataByID }
+module.exports = { getAllData , getDataByID, getAlbumImgByID, getCategoryImgByID, insetSingleUpload, dataDeleteById, updateDataByID }

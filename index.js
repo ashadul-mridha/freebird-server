@@ -63,7 +63,8 @@ app.use(notFoundhandler);
 //common error handler
 app.use(defaultErrorHandler);
 
-const port =5000 || process.env.DOMAIN
-app.listen(port, () => {
-    console.log('app running on port 5000');
-})
+const PORT = process.env.DOMAIN || 3000;
+app.listen(PORT, err => {
+    if(err) throw err;
+    console.log(` app running on port ${PORT}`);
+});

@@ -17,6 +17,7 @@ const imageRouter = require('./routers/imageRouter');
 const contactusRouter = require('./routers/contactUsRouter');
 const aboutmeRouter = require('./routers/aboutmeRouter');
 const clientRouter = require('./routers/clientRouter');
+const userRouter = require('./routers/userRouter');
 
 
 const app = express();
@@ -48,9 +49,10 @@ app.use('/api/image', imageRouter);
 app.use('/api/contactus', contactusRouter);
 app.use('/api/aboutme', aboutmeRouter);
 app.use('/api/client', clientRouter);
+app.use('/api/user', userRouter);
 
 app.get("/", (req,res) => {
-    res.send({message : "Hello Word"})
+    res.send({message : "Hello Freebird Server"})
 })
 
 // app.get("/api/category/all", (req,res) => {

@@ -11,7 +11,7 @@ const directory = path.parse('E:/Project/FreeBird-project/FreeBirdServer/control
 //get all data
 const getAllUser = async (req,res) => {
     try {
-        console.log(req);
+        // console.log(req.user);
         let { page , size } = req.query;
         
         if(!page){
@@ -90,17 +90,19 @@ const registrationUser = async (req, res) => {
                 data: null,
                 statusCode: 409
             })
+        } else {
+            const insertUserData = new User(newUser);
+            const data = await insertUserData.save();
+            
+            res.send({
+                status: true,
+                message: "data added successfull",
+                data : data,
+                statusCode: 200
+            })
         }
 
-        const insertUserData = new User(newUser);
-        const data = await insertUserData.save();
         
-        res.send({
-            status: true,
-            message: "data added successfull",
-            data : data,
-            statusCode: 200
-        })
 
     } catch (error) {
         
@@ -135,7 +137,8 @@ async function loginUser(req, res) {
         const userObject = {
           userid: user._id,
           name: user.name,
-          email: user.email
+          email: user.email,
+          userRole: user.userRole
         };
 
         // generate token
@@ -147,17 +150,26 @@ async function loginUser(req, res) {
 
         res.send({
             status: true,
-            message: "data added successfull",
+            message: "data fetch successfull",
             data : data,
             statusCode: 200
         })
 
       } else {
-        throw new Error("Login failed! Please try again.");
-        
+        res.send({
+            status: false,
+            message: "Login failed! Please try again.",
+            data : null,
+            statusCode: 500
+        })
       }
     } else {
-      throw new Error("Login failed! Please try again.");
+      res.send({
+          status: false,
+          message: "Login failed! Please try again.",
+          data : null,
+          statusCode: 500
+      })
     }
   } catch (err) {
     
@@ -230,6 +242,7 @@ const updateDataByID = async (req,res) => {
                     name: req.body.name,
                     live_link: req.body.live_link,
                     image: finalFileName,
+                    userRole: req.body.userRole,
                     isActive: req.body.isActive
                 }
             },

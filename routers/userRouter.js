@@ -9,7 +9,7 @@ const {checkLogin} = require('../middlewares/common/checkLogin');
 const router = express.Router();
 
 //get all homepage data
-router.get('/all', checkLogin, getAllUser)
+router.get('/all', getAllUser)
 
 //get data by id
 router.get('/:id', getUserByID)

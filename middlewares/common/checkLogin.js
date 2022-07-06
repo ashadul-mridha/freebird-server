@@ -15,7 +15,7 @@ const checkLogin = async (req, res, next) => {
             // Verify token
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-            // Get user from the token
+            // Get user from the token and set it user
             req.user = await User.findById(decoded.userid).select('-password')
 
             next()
